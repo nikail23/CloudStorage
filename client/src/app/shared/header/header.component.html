@@ -9,6 +9,7 @@
   </button>
   <span>Cloud Storage</span>
   <span class="example-spacer"></span>
+  <span>{{ userName }}</span>
   <button
     mat-icon-button
     class="example-icon favorite-icon"
@@ -30,7 +31,9 @@
         Load folder
       </button>
       <button mat-list-item color="accent">
-        <mat-icon class="sidenav-icon" color="accent">create_new_folder</mat-icon>
+        <mat-icon class="sidenav-icon" color="accent"
+          >create_new_folder</mat-icon
+        >
         Create folder
       </button>
     </mat-action-list>

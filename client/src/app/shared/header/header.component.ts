@@ -1,15 +1,34 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { SubscriptionsService } from './../../services/subscriptions.service';
+import { UserService } from './../../services/user.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
 
-  constructor() { }
+  private subscriptions: Array<Subscription> = [];
 
-  ngOnInit(): void {
+  public userName: string;
+
+  constructor(
+    private userService: UserService,
+    private subscriptionsService: SubscriptionsService
+  ) {
+    const subscription = this.userService.getUserName().subscribe((userName) => {
+      this.userName = userName;
+    });
+    this.subscriptionsService.push(subscription);
   }
 
+  ngOnInit(): void {
+
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptionsService.unsubscribeAll();
+  }
 }
