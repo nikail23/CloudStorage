@@ -1,3 +1,29 @@
+@import '../../../vars.scss';
+
 .example-spacer {
     flex: 1 1 auto;
+}
+
+.example-container {
+  width: 100%;
+  height: calc(100% - 64px);
+}
+
+.example-sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-sidenav {
+  padding: 20px;
+}
+
+.sidenav-caption {
+  text-align: center;
+}
+
+.sidenav-icon {
+  margin-right: $offset;
 }

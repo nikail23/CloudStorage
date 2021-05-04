@@ -1,10 +1,38 @@
 <mat-toolbar color="primary">
-    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <span>Cloud Storage</span>
-    <span class="example-spacer"></span>
-    <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-      <mat-icon>account_circle</mat-icon>
-    </button>
+  <button
+    mat-icon-button
+    class="example-icon"
+    (click)="drawer.toggle()"
+    aria-label="Example icon-button with menu icon"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>Cloud Storage</span>
+  <span class="example-spacer"></span>
+  <button
+    mat-icon-button
+    class="example-icon favorite-icon"
+    aria-label="Example icon-button with heart icon"
+  >
+    <mat-icon>account_circle</mat-icon>
+  </button>
 </mat-toolbar>
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer class="example-sidenav" mode="side">
+    <h2 class="sidenav-caption">Actions</h2>
+    <mat-action-list>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent">description</mat-icon>
+        Load file
+      </button>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent">folder</mat-icon>
+        Load folder
+      </button>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent">create_new_folder</mat-icon>
+        Create folder
+      </button>
+    </mat-action-list>
+  </mat-drawer>
+</mat-drawer-container>
