@@ -1,0 +1,29 @@
+@import '../../../vars.scss';
+
+.mat-list-icon {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.container {
+  width: 100%;
+  height: calc(100% - 64px);
+}
+
+.sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidenav {
+  padding: $offset;
+}
+
+.sidenav-caption {
+  text-align: center;
+}
+
+.sidenav-icon {
+  margin-right: $offset;
+}

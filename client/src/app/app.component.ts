@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { ListComponent } from './storage/list/list.component';
 
 @Component({
   selector: 'app-root',
@@ -9,8 +10,11 @@ export class AppComponent {
 
   title = 'client';
 
-  handleSidenavButtonClick() {
+  @ViewChild(ListComponent, {static: false})
+  private listComponent: ListComponent;
 
+  sidenavButtonClick() {
+    this.listComponent.toggleSidenav();
   }
 
 }

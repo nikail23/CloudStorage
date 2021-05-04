@@ -1,0 +1,36 @@
+<mat-drawer-container class="container" autosize>
+  <mat-drawer [opened]="sidenavOpened" class="sidenav" mode="side">
+    <h2 class="sidenav-caption">Actions</h2>
+    <mat-action-list>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent">description</mat-icon>
+        Load file
+      </button>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent">folder</mat-icon>
+        Load folder
+      </button>
+      <button mat-list-item color="accent">
+        <mat-icon class="sidenav-icon" color="accent"
+          >create_new_folder</mat-icon
+        >
+        Create folder
+      </button>
+    </mat-action-list>
+  </mat-drawer>
+  <mat-list>
+    <div mat-subheader>Folders</div>
+    <mat-list-item *ngFor="let folder of folders">
+      <mat-icon mat-list-icon>folder</mat-icon>
+      <div mat-line>{{folder.name}}</div>
+      <div mat-line> {{folder.updated | date}} </div>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <div mat-subheader>Notes</div>
+    <mat-list-item *ngFor="let note of notes">
+      <mat-icon mat-list-icon>note</mat-icon>
+      <div mat-line>{{note.name}}</div>
+      <div mat-line> {{note.updated | date}} </div>
+    </mat-list-item>
+  </mat-list>
+</mat-drawer-container>

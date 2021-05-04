@@ -1,7 +1,6 @@
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { UserService } from './../../services/user.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -10,7 +9,7 @@ import { Subscription } from 'rxjs';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
 
-  private subscriptions: Array<Subscription> = [];
+  @Output() sidenavButtonClicked = new EventEmitter();
 
   public userName: string;
 
