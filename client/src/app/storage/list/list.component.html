@@ -19,18 +19,13 @@
     </mat-action-list>
   </mat-drawer>
   <mat-list>
-    <div mat-subheader>Folders</div>
-    <mat-list-item *ngFor="let folder of folders">
-      <mat-icon mat-list-icon>folder</mat-icon>
-      <div mat-line>{{folder.name}}</div>
-      <div mat-line> {{folder.updated | date}} </div>
-    </mat-list-item>
-    <mat-divider></mat-divider>
-    <div mat-subheader>Notes</div>
-    <mat-list-item *ngFor="let note of notes">
-      <mat-icon mat-list-icon>note</mat-icon>
-      <div mat-line>{{note.name}}</div>
-      <div mat-line> {{note.updated | date}} </div>
+    <div mat-subheader>Root</div>
+    <mat-list-item *ngFor="let storageElement of storageList">
+      <mat-icon *ngIf="storageElement.type === StorageElementType.Folder" mat-list-icon>folder</mat-icon>
+      <mat-icon *ngIf="storageElement.type === StorageElementType.File" mat-list-icon>note</mat-icon>
+      <div mat-line> {{storageElement.name}} </div>
+      <div *ngIf="storageElement.type === StorageElementType.File" mat-line> {{storageElement.size}} kB, {{storageElement.createdAt | date}} </div>
+      <div *ngIf="storageElement.type === StorageElementType.Folder" mat-line> {{storageElement.createdAt | date}} </div>
     </mat-list-item>
   </mat-list>
 </mat-drawer-container>
