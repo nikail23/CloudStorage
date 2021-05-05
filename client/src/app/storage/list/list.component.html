@@ -35,9 +35,10 @@
         </mat-icon>
       </button>
     </button>
-    <button *ngIf="isFileLoading" [disableRipple]="true" mat-list-item>
-      loading
-    </button>
+    <div *ngIf="progressHelper.isFileLoading" class="progress-block" mat-list-item>
+      <h2 class="example-h2">{{ progressHelper.progressText }}</h2>
+      <mat-progress-bar mode="determinate" value="{{ progressHelper.percent }}"></mat-progress-bar>
+    </div>
 
   </mat-action-list>
 </mat-drawer-container>

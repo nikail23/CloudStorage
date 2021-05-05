@@ -24,7 +24,7 @@ export class StorageService {
 
   public sendFile(file: File): Observable<HttpEvent<Object>> {
     const uploadData = new FormData();
-    uploadData.append('upload_file', file, file.name);
+    uploadData.append('UploadFile', file, file.name);
     return this.http.post('http://127.0.0.1:3000/upload', uploadData, {
       reportProgress: true,
       observe: 'events',

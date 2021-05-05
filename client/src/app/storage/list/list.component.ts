@@ -1,8 +1,11 @@
+import { ProgressHelper } from './progressHelper';
 import { StorageElement, StorageElementType } from './../../services/storage.model';
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { StorageService } from './../../services/storage.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpEventType } from '@angular/common/http';
+import { of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list',
@@ -17,7 +20,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public storageList: StorageElement[];
 
-  public isFileLoading = false;
+  public progressHelper: ProgressHelper;
 
   constructor
   (
@@ -30,6 +33,7 @@ export class ListComponent implements OnInit, OnDestroy {
       this.storageList = storageList;
     });
     this.subscriptionService.push(subscription);
+    this.progressHelper = new ProgressHelper();
   }
 
   ngOnDestroy(): void {
@@ -45,27 +49,20 @@ export class ListComponent implements OnInit, OnDestroy {
         this.storageService.sendFile(file).subscribe((event) => {
           switch (event.type) {
             case HttpEventType.Sent:
-              this.isFileLoading = true;
-              console.log('Request sent!');
-              break;
-            case HttpEventType.ResponseHeader:
-              console.log('Response header received!');
+              this.progressHelper.startFileLoading();
               break;
             case HttpEventType.UploadProgress:
-              const kbLoaded = Math.round(event.loaded / 1024);
+              const loaded = Math.round(event.loaded / 1024);
               const percent = Math.round((event.loaded * 100) / event.total);
-              console.log(
-                `Upload in progress! ${kbLoaded}kB loaded (${percent}%)`
-              );
+              this.progressHelper.updateLoadedAndPercent(loaded, percent);
               break;
             case HttpEventType.Response:
-              console.log('Done!', event.body);
-              this.isFileLoading = false;
-              fileInput = null;
+              this.progressHelper.endFileLoading();
           }
         });
     });
     fileInput.click();
+    fileInput = null;
   }
 
   public uploadFolder() {
