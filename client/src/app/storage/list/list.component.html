@@ -2,7 +2,7 @@
   <mat-drawer [opened]="sidenavOpened" class="sidenav" mode="side">
     <h2 class="sidenav-caption">Actions</h2>
     <mat-action-list>
-      <button mat-list-item color="accent">
+      <button (click)="uploadFile()" type="" mat-list-item color="accent">
         <mat-icon class="sidenav-icon" color="accent">description</mat-icon>
         Load file
       </button>
@@ -11,21 +11,33 @@
         Load folder
       </button>
       <button mat-list-item color="accent">
-        <mat-icon class="sidenav-icon" color="accent"
-          >create_new_folder</mat-icon
-        >
+        <mat-icon class="sidenav-icon" color="accent">create_new_folder</mat-icon>
         Create folder
       </button>
     </mat-action-list>
   </mat-drawer>
-  <mat-list>
+  <mat-action-list>
     <div mat-subheader>Root</div>
-    <mat-list-item *ngFor="let storageElement of storageList">
+    <button [disableRipple]="true"  mat-list-item *ngFor="let storageElement of storageList" (click)="tryOpen($event, storageElement.id)">
       <mat-icon *ngIf="storageElement.type === StorageElementType.Folder" mat-list-icon>folder</mat-icon>
       <mat-icon *ngIf="storageElement.type === StorageElementType.File" mat-list-icon>note</mat-icon>
       <div mat-line> {{storageElement.name}} </div>
       <div *ngIf="storageElement.type === StorageElementType.File" mat-line> {{storageElement.size}} kB, {{storageElement.createdAt | date}} </div>
       <div *ngIf="storageElement.type === StorageElementType.Folder" mat-line> {{storageElement.createdAt | date}} </div>
-    </mat-list-item>
-  </mat-list>
+      <button (click)="download($event, storageElement.id)">
+        <mat-icon class="sidenav-icon" color="accent">
+          download
+        </mat-icon>
+      </button>
+      <button (click)="delete($event, storageElement.id)">
+        <mat-icon class="sidenav-icon" color="accent">
+          delete
+        </mat-icon>
+      </button>
+    </button>
+    <button *ngIf="isFileLoading" [disableRipple]="true" mat-list-item>
+      loading
+    </button>
+
+  </mat-action-list>
 </mat-drawer-container>

@@ -2,11 +2,7 @@ import { StorageElement, StorageElementType } from './../../services/storage.mod
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { StorageService } from './../../services/storage.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
-export interface Section {
-  name: string;
-  updated: Date;
-}
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-list',
@@ -20,6 +16,8 @@ export class ListComponent implements OnInit, OnDestroy {
   public sidenavOpened = false;
 
   public storageList: StorageElement[];
+
+  public isFileLoading = false;
 
   constructor
   (
@@ -38,8 +36,61 @@ export class ListComponent implements OnInit, OnDestroy {
     this.subscriptionService.unsubscribeAll();
   }
 
-  toggleSidenav() {
+  public uploadFile() {
+    let fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.addEventListener('change', event => {
+        const target = event.target as HTMLInputElement;
+        const file = target.files[0];
+        this.storageService.sendFile(file).subscribe((event) => {
+          switch (event.type) {
+            case HttpEventType.Sent:
+              this.isFileLoading = true;
+              console.log('Request sent!');
+              break;
+            case HttpEventType.ResponseHeader:
+              console.log('Response header received!');
+              break;
+            case HttpEventType.UploadProgress:
+              const kbLoaded = Math.round(event.loaded / 1024);
+              const percent = Math.round((event.loaded * 100) / event.total);
+              console.log(
+                `Upload in progress! ${kbLoaded}kB loaded (${percent}%)`
+              );
+              break;
+            case HttpEventType.Response:
+              console.log('Done!', event.body);
+              this.isFileLoading = false;
+              fileInput = null;
+          }
+        });
+    });
+    fileInput.click();
+  }
+
+  public uploadFolder() {
+
+  }
+
+  public toggleSidenav() {
     this.sidenavOpened = !this.sidenavOpened;
   }
 
+  public delete(event, id) {
+    if (event.target.outerText === 'delete') {
+      console.log(event)
+    }
+  }
+
+  public download(event, id) {
+    if (event.target.outerText === 'download') {
+      console.log(event)
+    }
+  }
+
+  public tryOpen(event, id) {
+    if (event.target.outerText !== 'download' && event.target.outerText !== 'delete') {
+
+    }
+  }
 }
