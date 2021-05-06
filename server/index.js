@@ -49,6 +49,10 @@ class StorageModel {
   getAll() {
     return this.storageList;
   }
+
+  get(id) {
+    return this.storageList[id];
+  }
 }
 
 const storage = new StorageModel("./storage/");
@@ -93,6 +97,28 @@ app.get("/storage", (request, response) => {
   response.status(200).send(
     storage.getAll()
   );
+});
+
+app.get("/download", (request, response) => {
+  console.log('i am here')
+
+  const id = parseInt(request.query.id);
+
+  console.log(id);
+
+  const path = storage.get(id).path;
+  const name = storage.get(id).name;
+
+  console.log(path)
+
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  response.download(path, name);
 });
 
 app.listen(port);

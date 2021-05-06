@@ -9,10 +9,10 @@ export class StorageElement {
   public path: string;
   public type: StorageElementType;
   public createdAt: Date;
-  public size?: number;
+  public size?: string;
   public children?: StorageElement[];
 
-  constructor(id: number, name: string, path: string, type: StorageElementType, createdAt: Date, size?: number, children?: StorageElement[]) {
+  constructor(id: number, name: string, path: string, type: StorageElementType, createdAt: Date, size?: string, children?: StorageElement[]) {
     this.id = id;
     this.name = name;
     this.path = path;

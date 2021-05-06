@@ -22,7 +22,7 @@
       <mat-icon *ngIf="storageElement.type === StorageElementType.Folder" mat-list-icon>folder</mat-icon>
       <mat-icon *ngIf="storageElement.type === StorageElementType.File" mat-list-icon>note</mat-icon>
       <div mat-line> {{storageElement.name}} </div>
-      <div *ngIf="storageElement.type === StorageElementType.File" mat-line> {{storageElement.size}} kB, {{storageElement.createdAt | date}} </div>
+      <div *ngIf="storageElement.type === StorageElementType.File" mat-line> {{storageElement.size}}, {{storageElement.createdAt | date}} </div>
       <div *ngIf="storageElement.type === StorageElementType.Folder" mat-line> {{storageElement.createdAt | date}} </div>
       <button (click)="download($event, storageElement.id)">
         <mat-icon class="sidenav-icon" color="accent">

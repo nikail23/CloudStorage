@@ -3,7 +3,7 @@ import { StorageElement, StorageElementType } from './../../services/storage.mod
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { StorageService } from './../../services/storage.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { HttpEventType } from '@angular/common/http';
+import { HttpEventType, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
@@ -17,9 +17,7 @@ export class ListComponent implements OnInit, OnDestroy {
   public StorageElementType = StorageElementType;
 
   public sidenavOpened = false;
-
   public storageList: StorageElement[];
-
   public progressHelper: ProgressHelper;
 
   constructor
@@ -29,15 +27,19 @@ export class ListComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const subscription = this.storageService.getAll().subscribe((storageList) => {
-      this.storageList = storageList;
-    });
-    this.subscriptionService.push(subscription);
+    this.loadStorageList();
     this.progressHelper = new ProgressHelper();
   }
 
   ngOnDestroy(): void {
     this.subscriptionService.unsubscribeAll();
+  }
+
+  public loadStorageList(): void {
+    const subscription = this.storageService.getAll().subscribe((storageList) => {
+      this.storageList = storageList;
+    });
+    this.subscriptionService.push(subscription);
   }
 
   public uploadFile() {
@@ -58,6 +60,7 @@ export class ListComponent implements OnInit, OnDestroy {
               break;
             case HttpEventType.Response:
               this.progressHelper.endFileLoading();
+              this.loadStorageList();
           }
         });
     });
@@ -81,7 +84,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public download(event, id) {
     if (event.target.outerText === 'download') {
-      console.log(event)
+      this.storageService.downloadFile(id, this.storageList[id].name);
     }
   }
 
