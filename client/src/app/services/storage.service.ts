@@ -8,11 +8,7 @@ import { StorageElement, StorageElementType } from './storage.model';
   providedIn: 'root',
 })
 export class StorageService {
-  private storageList: Array<StorageElement>;
-
-  constructor(private http: HttpClient) {
-    this.storageList = [];
-  }
+  constructor(private http: HttpClient) {}
 
   public getAll(): Observable<StorageElement[]> {
     return this.http.get('http://127.0.0.1:3000/storage').pipe(
@@ -70,12 +66,17 @@ export class StorageService {
     });
   }
 
-  public downloadFile(id: number, fileName: string) {
+  public downloadFile(id: number, fileName: string): void {
     let downloadAncher = document.createElement("a");
     downloadAncher.style.display = "none";
     downloadAncher.href = `http://127.0.0.1:3000/download?id=${id}`;
     downloadAncher.download = fileName;
     downloadAncher.click();
     downloadAncher = null;
+  }
+
+  public deleteFile(id: number): Observable<any> {
+    const params = new HttpParams().set('id', id.toString());
+    return this.http.delete('http://127.0.0.1:3000/delete', {params});
   }
 }

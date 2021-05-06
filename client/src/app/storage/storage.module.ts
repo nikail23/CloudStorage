@@ -1,4 +1,3 @@
-import { RippleService } from './../services/ripple.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -9,23 +8,23 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MAT_RIPPLE_GLOBAL_OPTIONS } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { DeleteComponent } from './list/delete/delete.component';
 
 @NgModule({
-  declarations: [ListComponent],
+  declarations: [ListComponent, DeleteComponent],
   imports: [
     CommonModule,
     SharedModule,
     MatListModule,
     MatIconModule,
     MatSidenavModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatDialogModule,
+    MatButtonModule
   ],
-  exports: [
-    ListComponent
-  ],
-  providers: [
-    {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useExisting: RippleService}
-  ]
+  exports: [ListComponent],
+  providers: [],
 })
-export class StorageModule { }
+export class StorageModule {}

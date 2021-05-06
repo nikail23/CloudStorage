@@ -1,11 +1,12 @@
+import { delay } from 'rxjs/operators';
+import { DeleteComponent } from './delete/delete.component';
 import { ProgressHelper } from './progressHelper';
 import { StorageElement, StorageElementType } from './../../services/storage.model';
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { StorageService } from './../../services/storage.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpEventType, HttpParams } from '@angular/common/http';
-import { of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-list',
@@ -23,7 +24,8 @@ export class ListComponent implements OnInit, OnDestroy {
   constructor
   (
     private storageService: StorageService,
-    private subscriptionService: SubscriptionsService
+    private subscriptionService: SubscriptionsService,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -76,21 +78,35 @@ export class ListComponent implements OnInit, OnDestroy {
     this.sidenavOpened = !this.sidenavOpened;
   }
 
-  public delete(event, id) {
+  public delete(event, id: number) {
     if (event.target.outerText === 'delete') {
-      console.log(event)
+        const dialog = this.dialog.open(DeleteComponent, {
+          data: this.storageList[id]
+        });
+
+        dialog.afterClosed().subscribe(result => {
+          if (result) {
+            this.storageService.deleteFile(id).pipe(
+              delay(500)
+            ).subscribe(() => {
+              this.loadStorageList();
+            });
+          }
+        });
     }
   }
 
-  public download(event, id) {
+  public download(event, id: number): void {
     if (event.target.outerText === 'download') {
       this.storageService.downloadFile(id, this.storageList[id].name);
+      this.loadStorageList();
     }
   }
 
-  public tryOpen(event, id) {
+  public tryOpen(event, id: number): void {
     if (event.target.outerText !== 'download' && event.target.outerText !== 'delete') {
 
+      this.loadStorageList();
     }
   }
 }

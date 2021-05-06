@@ -1,0 +1,12 @@
+.file-info {
+  display: flex;
+  flex-direction: column;
+
+  .name {
+    width: 20rem;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}

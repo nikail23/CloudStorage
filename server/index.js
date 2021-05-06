@@ -43,6 +43,10 @@ class StorageModel {
   }
 
   delete(id) {
+    const path = this.storageList[id].path;
+
+    fs.unlinkSync(path);
+
     this.storageList.splice(id, 1);
   }
 
@@ -62,6 +66,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+const fs = require("fs");
 
 app.use(
   fileUpload({
@@ -100,16 +105,9 @@ app.get("/storage", (request, response) => {
 });
 
 app.get("/download", (request, response) => {
-  console.log('i am here')
-
   const id = parseInt(request.query.id);
-
-  console.log(id);
-
   const path = storage.get(id).path;
   const name = storage.get(id).name;
-
-  console.log(path)
 
   response.setHeader("Access-Control-Allow-Origin", "*");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -119,6 +117,21 @@ app.get("/download", (request, response) => {
   );
 
   response.download(path, name);
+});
+
+app.delete("/delete", (request, response) => {
+  const id = parseInt(request.query.id);
+
+  storage.delete(id);
+
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  response.status(200).end();
 });
 
 app.listen(port);
