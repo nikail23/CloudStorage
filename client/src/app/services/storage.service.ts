@@ -1,4 +1,4 @@
-import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -78,5 +78,15 @@ export class StorageService {
   public deleteFile(id: number): Observable<any> {
     const params = new HttpParams().set('id', id.toString());
     return this.http.delete('http://127.0.0.1:3000/delete', {params});
+  }
+
+  public createFolder(name: string): Observable<any> {
+    const body = JSON.stringify({
+      name
+    });
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    return this.http.post('http://127.0.0.1:3000/createFolder', body, httpOptions);
   }
 }

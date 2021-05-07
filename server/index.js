@@ -42,6 +42,33 @@ class StorageModel {
     file.mv(path);
   }
 
+  createFolder(name) {
+    const path = this.storagePath + name;
+
+    try 
+    {
+      fs.mkdirSync(path);
+
+      const storageElement = new StorageElement(
+        this.storageList.length,
+        name,
+        path,
+        1,
+        new Date(),
+        undefined,
+        []
+      );
+  
+      this.storageList.push(storageElement);
+
+      return true;
+    }
+    catch (error) 
+    {
+      return false
+    }
+  }
+
   delete(id) {
     const path = this.storageList[id].path;
 
@@ -67,6 +94,7 @@ const app = express();
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
+const bodyParser = require('body-parser');
 
 app.use(
   fileUpload({
@@ -74,30 +102,33 @@ app.use(
   })
 );
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
 app.use(cors());
+
+function setHeaders(response) {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+}
 
 app.post("/upload", (request, response) => {
   const file = request.files.UploadFile;
 
   storage.add(file);
 
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+  setHeaders(response);
 
   response.status(200).send();
 });
 
 app.get("/storage", (request, response) => {
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+  setHeaders(response);
 
   response.status(200).send(
     storage.getAll()
@@ -109,29 +140,39 @@ app.get("/download", (request, response) => {
   const path = storage.get(id).path;
   const name = storage.get(id).name;
 
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+  setHeaders(response);
 
   response.download(path, name);
 });
 
 app.delete("/delete", (request, response) => {
+
+  console.log(request.query);
+
   const id = parseInt(request.query.id);
 
   storage.delete(id);
 
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+  setHeaders(response);
 
   response.status(200).end();
 });
+
+app.post("/createFolder", (request, response) => {
+  console.log(request.body);
+
+  const name = request.body.name;
+
+  setHeaders(response);
+
+  if (storage.createFolder(name)) {
+    response.status(200).end();
+  } else {
+    response.statusCode = 409;
+    response.statusMessage = 'Folder already exists!';
+    response.end();
+  }
+});
+
 
 app.listen(port);

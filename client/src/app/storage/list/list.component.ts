@@ -21,6 +21,8 @@ export class ListComponent implements OnInit, OnDestroy {
   public storageList: StorageElement[];
   public progressHelper: ProgressHelper;
 
+  public isFolderCreating = false;
+
   constructor
   (
     private storageService: StorageService,
@@ -42,6 +44,13 @@ export class ListComponent implements OnInit, OnDestroy {
       this.storageList = storageList;
     });
     this.subscriptionService.push(subscription);
+  }
+
+  public createFolder(name) {
+    this.storageService.createFolder(name).subscribe(() => {
+      this.isFolderCreating = false;
+      this.loadStorageList();
+    });
   }
 
   public uploadFile() {

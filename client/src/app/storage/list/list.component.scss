@@ -1,7 +1,9 @@
 @import '../../../vars.scss';
 
+$icon-color: rgba(0, 0, 0, 0.54);
+
 .mat-list-icon {
-  color: rgba(0, 0, 0, 0.54);
+  color: $icon-color;
 }
 
 .container {
@@ -24,11 +26,22 @@
   text-align: center;
 }
 
-.sidenav-icon {
-  margin-right: $offset;
-}
-
 .progress-block {
   padding: $offset;
   text-align: center;
+}
+
+.folder-name-input {
+  width: 11rem;
+  margin-left: $offset;
+  outline: 0;
+  border-radius: 0;
+  border-color: $icon-color;
+  color: $icon-color;
+  font-weight: bold;
+}
+
+.icon-button {
+  width: $offset;
+  margin-right: $offset;
 }

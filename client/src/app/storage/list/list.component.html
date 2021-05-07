@@ -10,35 +10,74 @@
         <mat-icon class="sidenav-icon" color="accent">folder</mat-icon>
         Load folder
       </button>
-      <button mat-list-item color="accent">
-        <mat-icon class="sidenav-icon" color="accent">create_new_folder</mat-icon>
+      <button mat-list-item color="accent" (click)="isFolderCreating = true">
+        <mat-icon class="sidenav-icon" color="accent"
+          >create_new_folder</mat-icon
+        >
         Create folder
       </button>
     </mat-action-list>
   </mat-drawer>
   <mat-action-list>
     <div mat-subheader>Root</div>
-    <button [disableRipple]="true"  mat-list-item *ngFor="let storageElement of storageList" (click)="tryOpen($event, storageElement.id)">
-      <mat-icon *ngIf="storageElement.type === StorageElementType.Folder" mat-list-icon>folder</mat-icon>
-      <mat-icon *ngIf="storageElement.type === StorageElementType.File" mat-list-icon>note</mat-icon>
-      <div mat-line> {{storageElement.name}} </div>
-      <div *ngIf="storageElement.type === StorageElementType.File" mat-line> {{storageElement.size}}, {{storageElement.createdAt | date}} </div>
-      <div *ngIf="storageElement.type === StorageElementType.Folder" mat-line> {{storageElement.createdAt | date}} </div>
-      <button (click)="download($event, storageElement.id)">
-        <mat-icon class="sidenav-icon" color="accent">
-          download
-        </mat-icon>
+    <button
+      [disableRipple]="true"
+      mat-list-item
+      *ngFor="let storageElement of storageList"
+      (click)="tryOpen($event, storageElement.id)"
+    >
+      <mat-icon
+        *ngIf="storageElement.type === StorageElementType.Folder"
+        mat-list-icon
+        >folder</mat-icon
+      >
+      <mat-icon
+        *ngIf="storageElement.type === StorageElementType.File"
+        mat-list-icon
+        >note</mat-icon
+      >
+      <div mat-line>{{ storageElement.name }}</div>
+      <div *ngIf="storageElement.type === StorageElementType.File" mat-line>
+        {{ storageElement.size }}, {{ storageElement.createdAt | date }}
+      </div>
+      <div *ngIf="storageElement.type === StorageElementType.Folder" mat-line>
+        {{ storageElement.createdAt | date }}
+      </div>
+      <button
+        class="icon-button"
+        (click)="download($event, storageElement.id)"
+        mat-button
+      >
+        <mat-icon color="accent"> download </mat-icon>
       </button>
-      <button (click)="delete($event, storageElement.id)">
-        <mat-icon class="sidenav-icon" color="accent">
-          delete
-        </mat-icon>
+      <button
+        class="icon-button"
+        (click)="delete($event, storageElement.id)"
+        mat-button
+      >
+        <mat-icon color="accent"> delete </mat-icon>
       </button>
     </button>
-    <div *ngIf="progressHelper.isFileLoading" class="progress-block" mat-list-item>
+    <button *ngIf="isFolderCreating" class="progress-block" mat-list-item>
+      <mat-icon mat-list-icon> folder </mat-icon>
+      <input #folderNameInput mat-line class="folder-name-input" type="text" />
+      <button (click)="createFolder(folderNameInput.value)" class="icon-button" mat-button>
+        <mat-icon color="accent"> done </mat-icon>
+      </button>
+      <button (click)="isFolderCreating = false" class="icon-button" mat-button>
+        <mat-icon color="accent"> close </mat-icon>
+      </button>
+    </button>
+    <div
+      *ngIf="progressHelper.isFileLoading"
+      class="progress-block"
+      mat-list-item
+    >
       <h2 class="example-h2">{{ progressHelper.progressText }}</h2>
-      <mat-progress-bar mode="determinate" value="{{ progressHelper.percent }}"></mat-progress-bar>
+      <mat-progress-bar
+        mode="determinate"
+        value="{{ progressHelper.percent }}"
+      ></mat-progress-bar>
     </div>
-
   </mat-action-list>
 </mat-drawer-container>
