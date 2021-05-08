@@ -89,8 +89,9 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public delete(event, id: number) {
     if (event.target.outerText === 'delete') {
+      this.storageService.get(id).subscribe((storageElement: StorageElement) => {
         const dialog = this.dialog.open(DeleteComponent, {
-          data: this.storageList[id]
+          data: storageElement
         });
 
         dialog.afterClosed().subscribe(result => {
@@ -102,6 +103,7 @@ export class ListComponent implements OnInit, OnDestroy {
             });
           }
         });
+      });
     }
   }
 

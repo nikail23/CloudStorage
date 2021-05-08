@@ -5,6 +5,7 @@ class StorageElement {
     path,
     type,
     createdAt,
+    parent,
     size,
     children
   ) {
@@ -13,6 +14,7 @@ class StorageElement {
     this.path = path;
     this.type = type;
     this.createdAt = createdAt;
+    this.parent = parent;
     this.size = size;
     this.children = children;
   }
@@ -28,11 +30,12 @@ class StorageModel {
     const path = this.storagePath + file.name;
 
     const storageElement = new StorageElement(
-      this.storageList.length,
+      idManager.getNextId(),
       file.name,
       path,
       0,
       new Date(),
+      undefined,
       file.size,
       []
     );
@@ -50,11 +53,12 @@ class StorageModel {
       fs.mkdirSync(path);
 
       const storageElement = new StorageElement(
-        this.storageList.length,
+        idManager.getNextId(),
         name,
         path,
         1,
         new Date(),
+        undefined,
         undefined,
         []
       );
@@ -70,9 +74,14 @@ class StorageModel {
   }
 
   delete(id) {
-    const path = this.storageList[id].path;
+    const deletedElement = this.get(id);
 
-    fs.unlinkSync(path);
+    console.log(`удаляемый элемент - ${deletedElement}`)
+
+    switch (deletedElement.type) {
+      case 0: fs.unlinkSync(deletedElement.path); break;
+      case 1: fs.rmdirSync(deletedElement.path); break;
+    }
 
     this.storageList.splice(id, 1);
   }
@@ -81,12 +90,67 @@ class StorageModel {
     return this.storageList;
   }
 
+  deepSearch(element, id) {
+    let result = null;
+
+    if (element.children && element.children.length > 0) {
+      element.children.forEach(child => {
+
+        console.log(`deepSearch: текущий - ${element.name} с id  ${element.id}`);
+
+        if (child.id === id) {
+          result = child;
+          return;
+        }
+  
+        this.deepSearch(child, id);
+      });
+    }
+
+    return result;
+  }
+
   get(id) {
-    return this.storageList[id];
+    let result = null;
+    
+    console.log(`start, искомое id ${id}`);
+
+    this.storageList.forEach(element => {
+
+      console.log(`get: текущий - ${element.name} с id  ${element.id}`);
+
+      console.log(`typeof переданный id = ${typeof id}`)
+      console.log(`typeof id элемента = ${typeof element.id}`)
+
+      if (element.id === id) {
+        console.log('элемент найден')
+        result = element;
+      }
+
+      if (!result) {
+        result = this.deepSearch(element);
+      }
+    });
+
+    console.log(`get: результат: ${result.name} с id ${result.id}`);
+
+    return result;
+  }
+}
+
+class IdManager {
+  constructor() {
+    this.lastId = -1;
+  }
+
+  getNextId() {
+    this.lastId++;
+    return this.lastId;
   }
 }
 
 const storage = new StorageModel("./storage/");
+const idManager = new IdManager();
 
 const port = 3000;
 const express = require("express");
@@ -127,12 +191,22 @@ app.post("/upload", (request, response) => {
   response.status(200).send();
 });
 
+app.get("/get", (request, response) => {
+  setHeaders(response);
+
+  const id = parseInt(request.query.id);
+
+  const result = storage.get(id);
+
+  response.status(200).send(result);
+});
+
 app.get("/storage", (request, response) => {
   setHeaders(response);
 
-  response.status(200).send(
-    storage.getAll()
-  );
+  const result = storage.getAll();
+
+  response.status(200).send(result);
 });
 
 app.get("/download", (request, response) => {
@@ -146,9 +220,6 @@ app.get("/download", (request, response) => {
 });
 
 app.delete("/delete", (request, response) => {
-
-  console.log(request.query);
-
   const id = parseInt(request.query.id);
 
   storage.delete(id);
@@ -159,8 +230,6 @@ app.delete("/delete", (request, response) => {
 });
 
 app.post("/createFolder", (request, response) => {
-  console.log(request.body);
-
   const name = request.body.name;
 
   setHeaders(response);

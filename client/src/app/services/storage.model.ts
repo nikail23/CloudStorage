@@ -9,16 +9,18 @@ export class StorageElement {
   public path: string;
   public type: StorageElementType;
   public createdAt: Date;
+  public parentId: number;
   public size?: string;
-  public children?: StorageElement[];
+  public childrenId?: number[];
 
-  constructor(id: number, name: string, path: string, type: StorageElementType, createdAt: Date, size?: string, children?: StorageElement[]) {
+  constructor(id: number, name: string, path: string, type: StorageElementType, createdAt: Date, parentId: number, size?: string, childrenId?: number[]) {
     this.id = id;
     this.name = name;
     this.path = path;
     this.type = type;
     this.createdAt = createdAt;
+    this.parentId = parentId;
     this.size = size;
-    this.children = children;
+    this.childrenId = childrenId;
   }
 }

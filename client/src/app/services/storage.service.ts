@@ -10,6 +10,52 @@ import { StorageElement, StorageElementType } from './storage.model';
 export class StorageService {
   constructor(private http: HttpClient) {}
 
+  public get(id: number): Observable<StorageElement> {
+    const params = new HttpParams().set('id', id.toString());
+    return this.http.get('http://127.0.0.1:3000/get', {params}).pipe(
+      map((storageElement: any) => {
+
+        let type: StorageElementType;
+
+          switch (storageElement.type) {
+            case 0: type = StorageElementType.File; break;
+            case 1: type = StorageElementType.Folder; break;
+          }
+
+          let size: string;
+
+          if (storageElement.size < 1024) {
+            size = `${(storageElement.size).toFixed(2)} B`;
+          }
+
+          if (storageElement.size >= 1024) {
+            size = `${(storageElement.size / 1024).toFixed(2)} kB`;
+          }
+
+          if (storageElement.size > 1024 * 1024 ) {
+            size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
+          }
+
+          if (storageElement.size > 1024 * 1024 * 1024 ) {
+            size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+          }
+
+        const newElement = new StorageElement(
+          storageElement.id,
+          storageElement.name,
+          storageElement.path,
+          type,
+          storageElement.createdAt,
+          storageElement.parentId,
+          size,
+          storageElement.children
+        );
+
+        return newElement;
+      })
+    );
+  }
+
   public getAll(): Observable<StorageElement[]> {
     return this.http.get('http://127.0.0.1:3000/storage').pipe(
       map((storageList: any[]) => {
@@ -47,6 +93,7 @@ export class StorageService {
               storageElement.path,
               type,
               storageElement.createdAt,
+              storageElement.parentId,
               size,
               storageElement.children
             )
