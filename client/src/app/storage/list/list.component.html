@@ -24,7 +24,7 @@
       [disableRipple]="true"
       mat-list-item
       *ngFor="let storageElement of storageList"
-      (click)="tryOpen($event, storageElement.id)"
+      (dblclick)="openFolder($event, storageElement.id)"
     >
       <mat-icon
         *ngIf="storageElement.type === StorageElementType.Folder"

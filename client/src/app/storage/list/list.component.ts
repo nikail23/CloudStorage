@@ -1,3 +1,4 @@
+import { PathHelper } from './pathHelper';
 import { delay } from 'rxjs/operators';
 import { DeleteComponent } from './delete/delete.component';
 import { ProgressHelper } from './progressHelper';
@@ -23,6 +24,8 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public isFolderCreating = false;
 
+  private pathHelper: PathHelper;
+
   constructor
   (
     private storageService: StorageService,
@@ -31,8 +34,9 @@ export class ListComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.loadStorageList();
     this.progressHelper = new ProgressHelper();
+    this.pathHelper = new PathHelper();
+    this.loadStorageList();
   }
 
   ngOnDestroy(): void {
@@ -40,10 +44,18 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   public loadStorageList(): void {
-    const subscription = this.storageService.getAll().subscribe((storageList) => {
-      this.storageList = storageList;
-    });
-    this.subscriptionService.push(subscription);
+    const last = this.pathHelper.getLast();
+    if (last !== null) {
+      const subscription = this.storageService.getChildren(last.childrenId).subscribe((storageList) => {
+        this.storageList = storageList;
+      });
+      this.subscriptionService.push(subscription);
+    } else {
+      const subscription = this.storageService.getAll().subscribe((storageList) => {
+        this.storageList = storageList;
+      });
+      this.subscriptionService.push(subscription);
+    }
   }
 
   public createFolder(name) {
@@ -114,10 +126,16 @@ export class ListComponent implements OnInit, OnDestroy {
     }
   }
 
-  public tryOpen(event, id: number): void {
+  public openFolder(event, id: number): void {
     if (event.target.outerText !== 'download' && event.target.outerText !== 'delete') {
+      this.storageService.get(id).subscribe((element) => {
 
-      this.loadStorageList();
+        if (element.type === StorageElementType.Folder) {
+          this.pathHelper.push(element);
+
+          this.loadStorageList();
+        }
+      });
     }
   }
 }

@@ -209,6 +209,20 @@ app.get("/storage", (request, response) => {
   response.status(200).send(result);
 });
 
+app.get("/children", (request, response) => {
+  setHeaders(response);
+
+  const ids = JSON.parse(request.query.ids);
+
+  const result = [];
+
+  ids.forEach(id => {
+    result.push(storage.get(id));
+  });
+
+  response.status(200).send(result);
+});
+
 app.get("/download", (request, response) => {
   const id = parseInt(request.query.id);
   const path = storage.get(id).path;
