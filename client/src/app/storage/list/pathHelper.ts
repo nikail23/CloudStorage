@@ -1,21 +1,20 @@
-import { StorageElement } from './../../services/storage.model';
-
+import { StorageService } from './../../services/storage.service';
 export class PathHelper {
   public pathString: string = 'Root ';
 
-  private path: StorageElement[];
+  private path: number[];
 
-  constructor() {
+  constructor(private storageService: StorageService) {
     this.path = [];
   }
 
-  public push(element: StorageElement): void {
-    this.path.push(element);
+  public push(id): void {
+    this.path.push(id);
 
     this.setPathString();
   }
 
-  public pop(): StorageElement {
+  public pop(): number {
     const result = this.path.pop();
 
     this.setPathString();
@@ -23,7 +22,7 @@ export class PathHelper {
     return result;
   }
 
-  public getLast(): StorageElement {
+  public getLast(): number {
     let result = null;
 
     if (this.path.length > 0) {
@@ -36,8 +35,20 @@ export class PathHelper {
   public setPathString(): void {
     this.pathString = 'Root ';
 
-    this.path.forEach(element => {
-      this.pathString = this.pathString + `/ ${element.name}`
+    this.path.forEach(id => {
+      this.storageService.get(id).subscribe((element) => {
+        this.pathString = this.pathString + `/ ${element.name}`;
+      });
     });
+  }
+
+  public getPath(): number[] {
+    const result = [];
+
+    this.path.forEach(id => {
+      result.push(id);
+    });
+
+    return result;
   }
 }

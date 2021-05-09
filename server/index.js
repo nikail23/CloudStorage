@@ -26,13 +26,22 @@ class StorageModel {
     this.storageList = [];
   }
 
-  add(file) {
-    const path = this.storagePath + file.name;
+  add(file, path) {
+    let newPath;
+    let lastElement;
+
+    if (path.length > 0) {
+      const lastElementId = path[path.length - 1]
+      lastElement = this.get(lastElementId);
+      newPath = lastElement.path + '/' + file.name;
+    } else {
+      newPath = this.storagePath + file.name;
+    }
 
     const storageElement = new StorageElement(
       idManager.getNextId(),
       file.name,
-      path,
+      newPath,
       0,
       new Date(),
       undefined,
@@ -40,22 +49,35 @@ class StorageModel {
       []
     );
 
-    this.storageList.push(storageElement);
+    if (lastElement) {
+      lastElement.children.push(storageElement);
+    } else {
+      this.storageList.push(storageElement);
+    }
 
-    file.mv(path);
+    file.mv(newPath);
   }
 
-  createFolder(name) {
-    const path = this.storagePath + name;
+  createFolder(name, path) {
+    let newPath;
+    let lastElement;
+
+    if (path.length > 0) {
+      const lastId = path[path.length - 1];
+      lastElement = this.get(lastId);
+      newPath = lastElement.path + '/' + name;
+    } else {
+      newPath = this.storagePath + name;
+    }
 
     try 
     {
-      fs.mkdirSync(path);
+      fs.mkdirSync(newPath);
 
       const storageElement = new StorageElement(
         idManager.getNextId(),
         name,
-        path,
+        newPath,
         1,
         new Date(),
         undefined,
@@ -63,7 +85,11 @@ class StorageModel {
         []
       );
   
-      this.storageList.push(storageElement);
+      if (lastElement) {
+        lastElement.children.push(storageElement);
+      } else {
+        this.storageList.push(storageElement);
+      }
 
       return true;
     }
@@ -76,14 +102,12 @@ class StorageModel {
   delete(id) {
     const deletedElement = this.get(id);
 
-    console.log(`удаляемый элемент - ${deletedElement}`)
-
     switch (deletedElement.type) {
       case 0: fs.unlinkSync(deletedElement.path); break;
       case 1: fs.rmdirSync(deletedElement.path); break;
     }
 
-    this.storageList.splice(id, 1);
+    this.storageList.splice(id, 1); // пофиксить удаление
   }
 
   getAll() {
@@ -93,17 +117,23 @@ class StorageModel {
   deepSearch(element, id) {
     let result = null;
 
-    if (element.children && element.children.length > 0) {
+    if (element.children) {
       element.children.forEach(child => {
 
-        console.log(`deepSearch: текущий - ${element.name} с id  ${element.id}`);
+        console.log(`deepSearch: текущий - ${child.name} с id  ${child.id}`);
+
+        console.log(`id переданное = ${id}, c типом ${typeof id}`)
+        console.log(`id ребенка = ${child.id}, c типом ${typeof child.id}`)
 
         if (child.id === id) {
+          console.log('элемент найден');
           result = child;
           return;
         }
   
-        this.deepSearch(child, id);
+        if (!result && child.type === 1) {
+          this.deepSearch(child, id);
+        }
       });
     }
 
@@ -112,6 +142,8 @@ class StorageModel {
 
   get(id) {
     let result = null;
+
+    console.log(JSON.stringify(this.storageList))
     
     console.log(`start, искомое id ${id}`);
 
@@ -119,20 +151,17 @@ class StorageModel {
 
       console.log(`get: текущий - ${element.name} с id  ${element.id}`);
 
-      console.log(`typeof переданный id = ${typeof id}`)
-      console.log(`typeof id элемента = ${typeof element.id}`)
-
       if (element.id === id) {
         console.log('элемент найден')
         result = element;
       }
 
-      if (!result) {
-        result = this.deepSearch(element);
+      if (!result && element.type === 1) {
+        result = this.deepSearch(element, id);
       }
     });
 
-    console.log(`get: результат: ${result.name} с id ${result.id}`);
+    // console.log(`get: результат: ${result.name} с id ${result.id}`);
 
     return result;
   }
@@ -159,6 +188,8 @@ const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
 const bodyParser = require('body-parser');
+const path = require("path");
+const { json } = require("body-parser");
 
 app.use(
   fileUpload({
@@ -183,8 +214,9 @@ function setHeaders(response) {
 
 app.post("/upload", (request, response) => {
   const file = request.files.UploadFile;
+  const path = JSON.parse(request.body.Path);
 
-  storage.add(file);
+  storage.add(file, path);
 
   setHeaders(response);
 
@@ -212,13 +244,16 @@ app.get("/storage", (request, response) => {
 app.get("/children", (request, response) => {
   setHeaders(response);
 
-  const ids = JSON.parse(request.query.ids);
+  const id = parseInt(request.query.id);
 
+  const lastElement = storage.get(id);
   const result = [];
 
-  ids.forEach(id => {
-    result.push(storage.get(id));
-  });
+  if (lastElement.children) {
+    lastElement.children.forEach(element => {
+      result.push(element);
+    });
+  }
 
   response.status(200).send(result);
 });
@@ -245,10 +280,11 @@ app.delete("/delete", (request, response) => {
 
 app.post("/createFolder", (request, response) => {
   const name = request.body.name;
+  const path = request.body.path;
 
   setHeaders(response);
 
-  if (storage.createFolder(name)) {
+  if (storage.createFolder(name, path)) {
     response.status(200).end();
   } else {
     response.statusCode = 409;

@@ -104,8 +104,8 @@ export class StorageService {
     );
   }
 
-  public getChildren(ids: number[]) {
-    const params = new HttpParams().set('ids', JSON.stringify(ids));
+  public getChildren(id: number) {
+    const params = new HttpParams().set('id', id.toString());
     return this.http.get('http://127.0.0.1:3000/children', {params}).pipe(
       map((storageList: any[]) => {
         const newList: StorageElement[] = [];
@@ -153,9 +153,10 @@ export class StorageService {
     );
   }
 
-  public sendFile(file: File): Observable<HttpEvent<Object>> {
+  public sendFile(file: File, path: number[]): Observable<HttpEvent<Object>> {
     const uploadData = new FormData();
     uploadData.append('UploadFile', file, file.name);
+    uploadData.append('Path', JSON.stringify(path));
     return this.http.post('http://127.0.0.1:3000/upload', uploadData, {
       reportProgress: true,
       observe: 'events',
@@ -176,9 +177,10 @@ export class StorageService {
     return this.http.delete('http://127.0.0.1:3000/delete', {params});
   }
 
-  public createFolder(name: string): Observable<any> {
+  public createFolder(name: string, path: number[]): Observable<any> {
     const body = JSON.stringify({
-      name
+      name,
+      path
     });
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

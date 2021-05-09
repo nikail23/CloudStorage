@@ -34,7 +34,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.progressHelper = new ProgressHelper();
-    this.pathHelper = new PathHelper();
+    this.pathHelper = new PathHelper(this.storageService);
     this.loadStorageList();
   }
 
@@ -43,9 +43,9 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   public loadStorageList(): void {
-    const last = this.pathHelper.getLast();
-    if (last !== null) {
-      const subscription = this.storageService.getChildren(last.childrenId).subscribe((storageList) => {
+    const lastId = this.pathHelper.getLast();
+    if (lastId !== null) {
+      const subscription = this.storageService.getChildren(lastId).subscribe((storageList) => {
         this.storageList = storageList;
       });
       this.subscriptionService.push(subscription);
@@ -58,7 +58,7 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   public createFolder(name) {
-    this.storageService.createFolder(name).subscribe(() => {
+    this.storageService.createFolder(name, this.pathHelper.getPath()).subscribe(() => {
       this.isFolderCreating = false;
       this.loadStorageList();
     });
@@ -70,7 +70,7 @@ export class ListComponent implements OnInit, OnDestroy {
     fileInput.addEventListener('change', event => {
         const target = event.target as HTMLInputElement;
         const file = target.files[0];
-        this.storageService.sendFile(file).subscribe((event) => {
+        this.storageService.sendFile(file, this.pathHelper.getPath()).subscribe((event) => {
           switch (event.type) {
             case HttpEventType.Sent:
               this.progressHelper.startFileLoading();
@@ -130,7 +130,7 @@ export class ListComponent implements OnInit, OnDestroy {
       this.storageService.get(id).subscribe((element) => {
 
         if (element.type === StorageElementType.Folder) {
-          this.pathHelper.push(element);
+          this.pathHelper.push(element.id);
 
           this.loadStorageList();
         }
