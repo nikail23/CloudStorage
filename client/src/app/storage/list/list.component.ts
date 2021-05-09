@@ -120,8 +120,10 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public download(event, id: number): void {
     if (event.target.outerText === 'download') {
-      this.storageService.downloadFile(id, this.storageList[id].name);
-      this.loadStorageList();
+      this.storageService.get(id).subscribe((element) => {
+        this.storageService.downloadFile(id, element.name);
+        this.loadStorageList();
+      });
     }
   }
 

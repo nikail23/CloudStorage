@@ -143,20 +143,14 @@ class StorageModel {
 
           if (element.children[i].id === id) {
             result = element.children[i];
-            console.log(`${result}`)
           }
     
-          console.log(`${result}`)
           if (result === null && element.children[i].type === 1) {
             result = this.deepSearch(element.children[i], id);
           }
         }
-        console.log(`${result}`)
       };
-      console.log(`${result}`)
     }
-
-    console.log(`${result}`)
 
     return result;
   }
@@ -172,14 +166,9 @@ class StorageModel {
   
         if (result === null && this.storageList[i].type === 1) {
           result = this.deepSearch(this.storageList[i], id);
-          console.log(`${result}`)
         }
-        console.log(`${result}`)
       }
-      console.log(`${result}`)
     };
-
-    console.log(`итоговый результат ${result}`)
 
     return result;
   }
@@ -247,13 +236,6 @@ app.get("/get", (request, response) => {
   const id = parseInt(request.query.id);
 
   const element = storage.get(id);
-  console.log(`результат поиска: {
-    id: ${element.id}
-    name: ${element.name}
-    path: ${element.name}
-    type: ${element.type}
-    children: ${element.children}
-  }`)
 
   const children = [];
   if (element.children) {
