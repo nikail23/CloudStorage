@@ -1,6 +1,8 @@
 import { StorageElement } from './../../services/storage.model';
 
 export class PathHelper {
+  public pathString: string = 'Root ';
+
   private path: StorageElement[];
 
   constructor() {
@@ -9,10 +11,16 @@ export class PathHelper {
 
   public push(element: StorageElement): void {
     this.path.push(element);
+
+    this.setPathString();
   }
 
   public pop(): StorageElement {
-    return this.path.pop();
+    const result = this.path.pop();
+
+    this.setPathString();
+
+    return result;
   }
 
   public getLast(): StorageElement {
@@ -23,5 +31,13 @@ export class PathHelper {
     }
 
     return result;
+  }
+
+  public setPathString(): void {
+    this.pathString = 'Root ';
+
+    this.path.forEach(element => {
+      this.pathString = this.pathString + `/ ${element.name}`
+    });
   }
 }

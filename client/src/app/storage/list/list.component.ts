@@ -21,10 +21,9 @@ export class ListComponent implements OnInit, OnDestroy {
   public sidenavOpened = false;
   public storageList: StorageElement[];
   public progressHelper: ProgressHelper;
+  public pathHelper: PathHelper;
 
   public isFolderCreating = false;
-
-  private pathHelper: PathHelper;
 
   constructor
   (
@@ -137,5 +136,11 @@ export class ListComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  public goBack() {
+    this.pathHelper.pop();
+
+    this.loadStorageList();
   }
 }

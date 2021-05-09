@@ -19,7 +19,14 @@
     </mat-action-list>
   </mat-drawer>
   <mat-action-list>
-    <div mat-subheader>Root</div>
+    <div mat-subheader>
+      <button (click)="goBack()" mat-icon-button>
+        <mat-icon [inline]="true" class="back-icon">
+          arrow_back
+        </mat-icon>
+      </button>
+      {{pathHelper.pathString}}
+    </div>
     <button
       [disableRipple]="true"
       mat-list-item
