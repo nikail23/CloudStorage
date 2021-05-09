@@ -24,20 +24,22 @@ export class StorageService {
 
           let size: string;
 
-          if (storageElement.size < 1024) {
-            size = `${(storageElement.size).toFixed(2)} B`;
-          }
+          if (storageElement.size) {
+            if (storageElement.size < 1024) {
+              size = `${(storageElement.size).toFixed(2)} B`;
+            }
 
-          if (storageElement.size >= 1024) {
-            size = `${(storageElement.size / 1024).toFixed(2)} kB`;
-          }
+            if (storageElement.size >= 1024) {
+              size = `${(storageElement.size / 1024).toFixed(2)} kB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
-          }
+            if (storageElement.size > 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            if (storageElement.size > 1024 * 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            }
           }
 
         const newElement = new StorageElement(
@@ -68,22 +70,24 @@ export class StorageService {
             case 1: type = StorageElementType.Folder; break;
           }
 
-          let size: string;
+          let size: string = '';
 
-          if (storageElement.size < 1024) {
-            size = `${(storageElement.size).toFixed(2)} B`;
-          }
+          if (storageElement.size) {
+            if (storageElement.size < 1024) {
+              size = `${(storageElement.size).toFixed(2)} B`;
+            }
 
-          if (storageElement.size >= 1024) {
-            size = `${(storageElement.size / 1024).toFixed(2)} kB`;
-          }
+            if (storageElement.size >= 1024) {
+              size = `${(storageElement.size / 1024).toFixed(2)} kB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
-          }
+            if (storageElement.size > 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            if (storageElement.size > 1024 * 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            }
           }
 
           newList.push(
@@ -119,20 +123,22 @@ export class StorageService {
 
           let size: string;
 
-          if (storageElement.size < 1024) {
-            size = `${(storageElement.size).toFixed(2)} B`;
-          }
+          if (storageElement.size) {
+            if (storageElement.size < 1024) {
+              size = `${(storageElement.size).toFixed(2)} B`;
+            }
 
-          if (storageElement.size >= 1024) {
-            size = `${(storageElement.size / 1024).toFixed(2)} kB`;
-          }
+            if (storageElement.size >= 1024) {
+              size = `${(storageElement.size / 1024).toFixed(2)} kB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
-          }
+            if (storageElement.size > 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024)).toFixed(2)} mB`;
+            }
 
-          if (storageElement.size > 1024 * 1024 * 1024 ) {
-            size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            if (storageElement.size > 1024 * 1024 * 1024 ) {
+              size = `${(storageElement.size / (1024 * 1024 * 1024)).toFixed(2)} gB`;
+            }
           }
 
           newList.push(

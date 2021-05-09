@@ -44,13 +44,14 @@ class StorageModel {
       newPath,
       0,
       new Date(),
-      undefined,
+      null,
       file.size,
       []
     );
 
     if (lastElement) {
       lastElement.children.push(storageElement);
+      storageElement.parent = lastElement;
     } else {
       this.storageList.push(storageElement);
     }
@@ -80,13 +81,14 @@ class StorageModel {
         newPath,
         1,
         new Date(),
-        undefined,
-        undefined,
+        null,
+        null,
         []
       );
   
       if (lastElement) {
         lastElement.children.push(storageElement);
+        storageElement.parent = lastElement;
       } else {
         this.storageList.push(storageElement);
       }
@@ -107,7 +109,25 @@ class StorageModel {
       case 1: fs.rmdirSync(deletedElement.path); break;
     }
 
-    this.storageList.splice(id, 1); // пофиксить удаление
+    deletedElement.children = null;
+    const parent = deletedElement.parent;
+    if (parent) {
+      let index;
+      parent.children.forEach((element, idx) => {
+        if (element.id === id) {
+          index = idx;
+        }
+      });
+      parent.children.splice(index, 1);
+    } else {
+      let index;
+      this.storageList.forEach((element, idx) => {
+        if (element.id === id) {
+          index = idx;
+        }
+      });
+      this.storageList.splice(index, 1);
+    }
   }
 
   getAll() {
@@ -118,24 +138,25 @@ class StorageModel {
     let result = null;
 
     if (element.children) {
-      element.children.forEach(child => {
+      for (let i = 0; i < element.children.length; i++) {
+        if (result === null) {
 
-        console.log(`deepSearch: текущий - ${child.name} с id  ${child.id}`);
-
-        console.log(`id переданное = ${id}, c типом ${typeof id}`)
-        console.log(`id ребенка = ${child.id}, c типом ${typeof child.id}`)
-
-        if (child.id === id) {
-          console.log('элемент найден');
-          result = child;
-          return;
+          if (element.children[i].id === id) {
+            result = element.children[i];
+            console.log(`${result}`)
+          }
+    
+          console.log(`${result}`)
+          if (result === null && element.children[i].type === 1) {
+            result = this.deepSearch(element.children[i], id);
+          }
         }
-  
-        if (!result && child.type === 1) {
-          this.deepSearch(child, id);
-        }
-      });
+        console.log(`${result}`)
+      };
+      console.log(`${result}`)
     }
+
+    console.log(`${result}`)
 
     return result;
   }
@@ -143,25 +164,22 @@ class StorageModel {
   get(id) {
     let result = null;
 
-    console.log(JSON.stringify(this.storageList))
-    
-    console.log(`start, искомое id ${id}`);
-
-    this.storageList.forEach(element => {
-
-      console.log(`get: текущий - ${element.name} с id  ${element.id}`);
-
-      if (element.id === id) {
-        console.log('элемент найден')
-        result = element;
+    for (let i = 0; i < this.storageList.length; i++) {
+      if (result === null) {
+        if (this.storageList[i].id === id) {
+          result = this.storageList[i];
+        }
+  
+        if (result === null && this.storageList[i].type === 1) {
+          result = this.deepSearch(this.storageList[i], id);
+          console.log(`${result}`)
+        }
+        console.log(`${result}`)
       }
+      console.log(`${result}`)
+    };
 
-      if (!result && element.type === 1) {
-        result = this.deepSearch(element, id);
-      }
-    });
-
-    // console.log(`get: результат: ${result.name} с id ${result.id}`);
+    console.log(`итоговый результат ${result}`)
 
     return result;
   }
@@ -228,7 +246,30 @@ app.get("/get", (request, response) => {
 
   const id = parseInt(request.query.id);
 
-  const result = storage.get(id);
+  const element = storage.get(id);
+  console.log(`результат поиска: {
+    id: ${element.id}
+    name: ${element.name}
+    path: ${element.name}
+    type: ${element.type}
+    children: ${element.children}
+  }`)
+
+  const children = [];
+  if (element.children) {
+    element.children.forEach(child => {
+      children.push(child.id);
+    });
+  }
+
+  const result = {
+      id: element.id,
+      name: element.name,
+      size: element.size,
+      createdAt: element.createdAt,
+      type: element.type,
+      children: children
+  };
 
   response.status(200).send(result);
 });
@@ -236,7 +277,24 @@ app.get("/get", (request, response) => {
 app.get("/storage", (request, response) => {
   setHeaders(response);
 
-  const result = storage.getAll();
+  const result = storage.getAll().map((element) => {
+
+    const children = [];
+    if (element.children) {
+      element.children.forEach(child => {
+        children.push(child.id);
+      });
+    }
+
+    return {
+      id: element.id,
+      name: element.name,
+      size: element.size,
+      createdAt: element.createdAt,
+      type: element.type,
+      children: children
+    }
+  });
 
   response.status(200).send(result);
 });
@@ -247,13 +305,31 @@ app.get("/children", (request, response) => {
   const id = parseInt(request.query.id);
 
   const lastElement = storage.get(id);
-  const result = [];
+  let result = [];
 
   if (lastElement.children) {
     lastElement.children.forEach(element => {
       result.push(element);
     });
   }
+
+  result = result.map((element) => {
+    const children = [];
+    if (element.children) {
+      element.children.forEach(child => {
+        children.push(child.id);
+      });
+    }
+
+    return {
+      id: element.id,
+      name: element.name,
+      size: element.size,
+      createdAt: element.createdAt,
+      type: element.type,
+      children: children
+    }
+  });
 
   response.status(200).send(result);
 });
