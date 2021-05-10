@@ -9,6 +9,7 @@ import { ListComponent } from './storage/list/list.component';
 export class AppComponent {
 
   title = 'client';
+  userName = '';
 
   isStarted = true;
 
@@ -17,6 +18,11 @@ export class AppComponent {
 
   sidenavButtonClick() {
     this.listComponent.toggleSidenav();
+  }
+
+  public succesfullyLogin(userName) {
+    this.isStarted = false;
+    this.userName = userName;
   }
 
 }

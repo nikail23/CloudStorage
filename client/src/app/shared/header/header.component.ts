@@ -1,6 +1,6 @@
 import { SubscriptionsService } from './../../services/subscriptions.service';
 import { UserService } from './../../services/user.service';
-import { Component, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -11,12 +11,9 @@ export class HeaderComponent implements OnInit {
 
   @Output() sidenavButtonClicked = new EventEmitter();
 
-  public userName: string;
+  @Input() userName: string;
 
-  constructor(
-    private userService: UserService
-  ) {
-    this.userName = this.userService.getUserName();
+  constructor() {
   }
 
   ngOnInit(): void {

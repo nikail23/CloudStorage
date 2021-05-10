@@ -15,12 +15,17 @@
               </td>
             </tr>
             <tr>
-            <td>
-              <mat-form-field class="full-width">
-                <input matInput placeholder="Password" [(ngModel)]="password" type="password" name="password" required>
-              </mat-form-field>
-            </td>
-          </tr>
+              <td>
+                <mat-form-field class="full-width">
+                  <input matInput placeholder="Password" [(ngModel)]="password" type="password" name="password" required>
+                </mat-form-field>
+              </td>
+            </tr>
+            <tr>
+              <td class="error">
+                {{errorMessage}}
+              </td>
+            </tr>
         </table>
         <table *ngIf="!isLogin" cellspacing="0">
           <tr>
@@ -44,17 +49,22 @@
             </mat-form-field>
           </td>
         </tr>
+        <tr>
+          <td class="error">
+            {{errorMessage}}
+          </td>
+        </tr>
       </table>
       </form>
       <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
     </mat-card-content>
     <mat-card-actions>
       <div *ngIf="isLogin">
-        <button class="main-button" mat-raised-button color="primary">Log In</button>
+        <button (click)="logIn(login, password)" class="main-button" mat-raised-button color="primary">Log In</button>
         <button (click)="isLogin = !isLogin" class="switch-button" mat-button>Register</button>
       </div>
       <div *ngIf="!isLogin">
-        <button class="main-button" mat-raised-button color="primary">Register</button>
+        <button (click)="register(login, password, repeatPassword)" class="main-button" mat-raised-button color="primary">Register</button>
         <button (click)="isLogin = !isLogin" class="switch-button" mat-button>Log In</button>
       </div>
     </mat-card-actions>

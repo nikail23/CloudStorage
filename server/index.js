@@ -20,6 +20,65 @@ class StorageElement {
   }
 }
 
+class User {
+  constructor(id, login, password) {
+    this.id = id;
+    this.login = login;
+    this.password = password;
+  }
+}
+
+class UserModel {
+  constructor() {
+    this.users = [];
+  }
+
+  check(login) {
+    let result = false;
+
+    this.users.forEach(user => {
+      if (user.login === login) {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
+  register(login, password) {
+    if (!this.check(login)) {
+      const newUser = new User(this.users.length, login, password);
+      this.users.push(newUser);
+      return true;
+    }
+    return false;
+  }
+
+  login(login, password) {
+    let result = false;
+
+    this.users.forEach(user => {
+      if (user.login === login && user.password === password) {
+        result = true;
+      }
+    });
+
+    return result;
+  }
+
+  get(login) {
+    let result = null;
+
+    this.users.forEach(user => {
+      if (user.login === login) {
+        result = user;
+      }
+    });
+
+    return result;
+  }
+}
+
 class StorageModel {
   constructor(storagePath) {
     this.storagePath = storagePath;
@@ -186,6 +245,7 @@ class IdManager {
 }
 
 const storage = new StorageModel("./storage/");
+const users = new UserModel();
 const idManager = new IdManager();
 
 const port = 3000;
@@ -197,7 +257,6 @@ const fs = require("fs");
 const bodyParser = require('body-parser');
 const archiver = require("archiver");
 const path = require("path");
-const execFile = require('child_process').execFile;
 
 
 app.use(
@@ -220,6 +279,42 @@ function setHeaders(response) {
     "GET, POST, PUT, DELETE, OPTIONS"
   );
 }
+
+app.get("/register", (request, response) => {
+  setHeaders(response);
+
+  const login = request.query.login;
+  const password = request.query.password;
+
+  const result = users.register(login, password);
+  if (result) {
+    response.status(200).send(result);
+  } else {
+    response.statusCode = 409;
+    response.statusMessage = "User with this login already exists!";
+    response.send(result);
+  }
+});
+
+app.get("/login", (request, response) => {
+  setHeaders(response);
+
+  const login = request.query.login;
+  const password = request.query.password;
+
+  const result = users.login(login, password);
+  if (result) {
+    response.status(200).send(JSON.stringify(
+      {
+        login
+      }
+    ));
+  } else {
+    response.statusCode = 404;
+    response.statusMessage = "User with this values dont founded!";
+    response.end();
+  }
+});
 
 app.post("/upload", (request, response) => {
   const file = request.files.UploadFile;

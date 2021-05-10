@@ -6,10 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
-  private userName: string;
 
   constructor(private http: HttpClient) {
-    this.userName = '';
   }
 
   public logIn(login: string, password: string): Observable<string> {
@@ -24,9 +22,5 @@ export class UserService {
     .set('login', login)
     .set('password', password);
     return this.http.get<boolean>('http://127.0.0.1:3000/register', {params});
-  }
-
-  public getUserName(): string {
-    return this.userName;
   }
 }
