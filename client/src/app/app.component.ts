@@ -11,7 +11,7 @@ export class AppComponent {
   title = 'client';
   userName = '';
 
-  isStarted = true;
+  isAuth = true;
 
   @ViewChild(ListComponent, {static: false})
   private listComponent: ListComponent;
@@ -20,8 +20,13 @@ export class AppComponent {
     this.listComponent.toggleSidenav();
   }
 
+  public logOut() {
+    this.userName = '';
+    this.isAuth = true;
+  }
+
   public succesfullyLogin(userName) {
-    this.isStarted = false;
+    this.isAuth = false;
     this.userName = userName;
   }
 

@@ -1,5 +1,6 @@
 <mat-toolbar color="primary">
   <button
+    *ngIf="!isAuth"
     mat-icon-button
     class="example-icon"
     (click)="sidenavButtonClicked.emit()"
@@ -9,12 +10,17 @@
   </button>
   <span>Cloud Storage</span>
   <span class="example-spacer"></span>
-  <span>{{ userName }}</span>
+  <span *ngIf="!isAuth">{{ userName }}</span>
   <button
+    *ngIf="!isAuth"
+    [matMenuTriggerFor]="menu"
     mat-icon-button
     class="example-icon favorite-icon"
     aria-label="Example icon-button with heart icon"
   >
     <mat-icon>account_circle</mat-icon>
   </button>
+  <mat-menu #menu="matMenu">
+    <button (click)="logOut()" mat-menu-item>Log Out</button>
+  </mat-menu>
 </mat-toolbar>

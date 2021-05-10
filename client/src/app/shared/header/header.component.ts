@@ -10,13 +10,19 @@ import { Component, OnDestroy, OnInit, Output, EventEmitter, Input } from '@angu
 export class HeaderComponent implements OnInit {
 
   @Output() sidenavButtonClicked = new EventEmitter();
+  @Output() logOutEvent = new EventEmitter();
 
   @Input() userName: string;
+  @Input() isAuth: boolean;
 
   constructor() {
   }
 
   ngOnInit(): void {
 
+  }
+
+  public logOut() {
+    this.logOutEvent.emit();
   }
 }

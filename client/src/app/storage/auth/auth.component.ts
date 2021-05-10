@@ -28,9 +28,11 @@ export class AuthComponent implements OnInit {
     this.userService.logIn(login, password).subscribe((result) => {
       if (result) {
         this.loginEvent.emit(result['login']);
-      } else {
-        this.errorMessage = "User with such values dont exists!";
       }
+    },
+    (error) => {
+      this.errorMessage = error['statusText'];
+      ;
     });
   }
 
@@ -42,6 +44,9 @@ export class AuthComponent implements OnInit {
         } else {
           this.errorMessage = "Something went wrong!";
         }
+      },
+      (error) => {
+        this.errorMessage = error['statusText'];
       });
     } else {
       this.errorMessage = "Passwords are different!";

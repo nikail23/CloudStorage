@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ServicesModule } from './../services/services.module';
 
+import { ErrorComponent } from './error/error.component';
 import { HeaderComponent } from './header/header.component';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -9,7 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ErrorComponent } from './error/error.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -22,10 +23,12 @@ import { ErrorComponent } from './error/error.component';
     MatIconModule,
     MatButtonModule,
     MatListModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatMenuModule
   ],
   exports: [
-    HeaderComponent
+    HeaderComponent,
+    ErrorComponent
   ],
   providers: [
     ServicesModule

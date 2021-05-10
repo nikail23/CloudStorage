@@ -1,3 +1,3 @@
-<app-header [userName]="userName" (sidenavButtonClicked)="sidenavButtonClick()"></app-header>
-<app-list *ngIf="!isStarted"></app-list>
-<app-auth (loginEvent)="succesfullyLogin($event)" *ngIf="isStarted"></app-auth>
+<app-header [userName]="userName" [isAuth]="isAuth" (logOutEvent)="logOut()" (sidenavButtonClicked)="sidenavButtonClick()"></app-header>
+<app-list *ngIf="!isAuth"></app-list>
+<app-auth (loginEvent)="succesfullyLogin($event)" *ngIf="isAuth"></app-auth>
