@@ -195,8 +195,10 @@ const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
 const bodyParser = require('body-parser');
+const archiver = require("archiver");
 const path = require("path");
-const { json } = require("body-parser");
+const execFile = require('child_process').execFile;
+
 
 app.use(
   fileUpload({
@@ -318,12 +320,33 @@ app.get("/children", (request, response) => {
 
 app.get("/download", (request, response) => {
   const id = parseInt(request.query.id);
-  const path = storage.get(id).path;
-  const name = storage.get(id).name;
+  const element = storage.get(id);
 
   setHeaders(response);
 
-  response.download(path, name);
+  if (element.type === 1) {
+    const folderPath = path.join(__dirname, element.path);
+    const zipName = `/${element.name}.zip`;
+
+    response.attachment(zipName);
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+
+    archive.on('end', function() {
+      console.log('Archive wrote %d bytes', archive.pointer());
+    });
+    
+    archive.on('error', function(err) {
+      throw err;
+    });
+
+    archive.pipe(response);
+    archive.directory(folderPath, false);
+    archive.finalize();
+  } else {
+    response.download(element.path, element.name);
+  }
 });
 
 app.delete("/delete", (request, response) => {
