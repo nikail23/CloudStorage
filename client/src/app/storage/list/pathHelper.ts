@@ -3,9 +3,11 @@ export class PathHelper {
   public pathString: string = 'Root ';
 
   private path: number[];
+  private userName: string;
 
-  constructor(private storageService: StorageService) {
+  constructor(userName: string, private storageService: StorageService) {
     this.path = [];
+    this.userName = userName;
   }
 
   public push(id): void {
@@ -36,7 +38,7 @@ export class PathHelper {
     this.pathString = 'Root ';
 
     this.path.forEach(id => {
-      this.storageService.get(id).subscribe((element) => {
+      this.storageService.get(id, this.userName).subscribe((element) => {
         this.pathString = this.pathString + `/ ${element.name}`;
       });
     });

@@ -61,11 +61,11 @@
     <mat-card-actions>
       <div *ngIf="isLogin">
         <button (click)="logIn(login, password)" class="main-button" mat-raised-button color="primary">Log In</button>
-        <button (click)="isLogin = !isLogin" class="switch-button" mat-button>Register</button>
+        <button (click)="isLogin = !isLogin; errorMessage = ''" class="switch-button" mat-button>Register</button>
       </div>
       <div *ngIf="!isLogin">
         <button (click)="register(login, password, repeatPassword)" class="main-button" mat-raised-button color="primary">Register</button>
-        <button (click)="isLogin = !isLogin" class="switch-button" mat-button>Log In</button>
+        <button (click)="isLogin = !isLogin; errorMessage = ''" class="switch-button" mat-button>Log In</button>
       </div>
     </mat-card-actions>
   </mat-card>

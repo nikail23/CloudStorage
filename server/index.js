@@ -1,3 +1,10 @@
+class Storage {
+  constructor(owner) {
+    this.owner = owner;
+    this.storageList = [];
+  }
+}
+
 class StorageElement {
   constructor(
     id,
@@ -82,19 +89,50 @@ class UserModel {
 class StorageModel {
   constructor(storagePath) {
     this.storagePath = storagePath;
-    this.storageList = [];
+    this.storages = [];
   }
 
-  add(file, path) {
+  getStorage(userName) {
+    let result = null;
+
+    this.storages.forEach(storage => {
+      if (storage.owner === userName) {
+        result = storage;
+      }
+    });
+
+    return result;
+  }
+
+  createStorage(userName) {
+    const storage = new Storage(userName);
+    this.storages.push(storage);
+
+    try {
+      fs.mkdirSync(this.storagePath + userName);
+    }
+    catch(error) {
+      console.log(error);
+    }
+
+    return storage;
+  }
+
+  add(file, path, userName) {
+    let storage = this.getStorage(userName);
+    if (!storage) {
+      storage = this.createStorage(userName);
+    }
+
     let newPath;
     let lastElement;
 
     if (path.length > 0) {
       const lastElementId = path[path.length - 1]
-      lastElement = this.get(lastElementId);
-      newPath = lastElement.path + '/' + file.name;
+      lastElement = this.get(lastElementId, storage.storageList);
+      newPath = lastElement.path + `/` + file.name;
     } else {
-      newPath = this.storagePath + file.name;
+      newPath = this.storagePath + `/${storage.owner}/` + file.name;
     }
 
     const storageElement = new StorageElement(
@@ -112,22 +150,27 @@ class StorageModel {
       lastElement.children.push(storageElement);
       storageElement.parent = lastElement;
     } else {
-      this.storageList.push(storageElement);
+      storage.storageList.push(storageElement);
     }
 
     file.mv(newPath);
   }
 
-  createFolder(name, path) {
+  createFolder(name, path, userName) {
+    let storage = this.getStorage(userName);
+    if (!storage) {
+      storage = this.createStorage(userName);
+    }
+
     let newPath;
     let lastElement;
 
     if (path.length > 0) {
       const lastId = path[path.length - 1];
-      lastElement = this.get(lastId);
+      lastElement = this.get(lastId, storage.storageList);
       newPath = lastElement.path + '/' + name;
     } else {
-      newPath = this.storagePath + name;
+      newPath = this.storagePath + `${storage.owner}/` + name;
     }
 
     try 
@@ -149,7 +192,7 @@ class StorageModel {
         lastElement.children.push(storageElement);
         storageElement.parent = lastElement;
       } else {
-        this.storageList.push(storageElement);
+        storage.storageList.push(storageElement);
       }
 
       return true;
@@ -160,12 +203,17 @@ class StorageModel {
     }
   }
 
-  delete(id) {
-    const deletedElement = this.get(id);
+  delete(id, userName) {
+    let storage = this.getStorage(userName);
+    if (!storage) {
+      storage = this.createStorage(userName);
+    }
+
+    const deletedElement = this.get(id, storage.storageList);
 
     switch (deletedElement.type) {
       case 0: fs.unlinkSync(deletedElement.path); break;
-      case 1: fs.rmdirSync(deletedElement.path); break;
+      case 1: rimraf.sync(deletedElement.path); break;
     }
 
     deletedElement.children = null;
@@ -180,17 +228,21 @@ class StorageModel {
       parent.children.splice(index, 1);
     } else {
       let index;
-      this.storageList.forEach((element, idx) => {
+      storage.storageList.forEach((element, idx) => {
         if (element.id === id) {
           index = idx;
         }
       });
-      this.storageList.splice(index, 1);
+      storage.storageList.splice(index, 1);
     }
   }
 
-  getAll() {
-    return this.storageList;
+  getAll(userName) {
+    let storage = this.getStorage(userName);
+    if (!storage) {
+      storage = this.createStorage(userName);
+    }
+    return storage.storageList;
   }
 
   deepSearch(element, id) {
@@ -214,17 +266,19 @@ class StorageModel {
     return result;
   }
 
-  get(id) {
+  get(id, storageList) {
     let result = null;
 
-    for (let i = 0; i < this.storageList.length; i++) {
+    console.log(storageList)
+
+    for (let i = 0; i < storageList.length; i++) {
       if (result === null) {
-        if (this.storageList[i].id === id) {
-          result = this.storageList[i];
+        if (storageList[i].id === id) {
+          result = storageList[i];
         }
   
-        if (result === null && this.storageList[i].type === 1) {
-          result = this.deepSearch(this.storageList[i], id);
+        if (result === null && storageList[i].type === 1) {
+          result = this.deepSearch(storageList[i], id);
         }
       }
     };
@@ -244,7 +298,7 @@ class IdManager {
   }
 }
 
-const storage = new StorageModel("./storage/");
+const storages = new StorageModel("./storage/");
 const users = new UserModel();
 const idManager = new IdManager();
 
@@ -254,6 +308,7 @@ const app = express();
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
+const rimraf = require("rimraf");
 const bodyParser = require('body-parser');
 const archiver = require("archiver");
 const path = require("path");
@@ -319,8 +374,9 @@ app.get("/login", (request, response) => {
 app.post("/upload", (request, response) => {
   const file = request.files.UploadFile;
   const path = JSON.parse(request.body.Path);
+  const userName = JSON.parse(request.body.userName);
 
-  storage.add(file, path);
+  storages.add(file, path, userName);
 
   setHeaders(response);
 
@@ -331,8 +387,18 @@ app.get("/get", (request, response) => {
   setHeaders(response);
 
   const id = parseInt(request.query.id);
+  const userName = request.query.userName;
 
-  const element = storage.get(id);
+  console.log(userName);
+
+  let storage = storages.getStorage(userName);
+  if (!storage)  {
+    storage = storages.createStorage(userName);
+  }
+
+  console.log(storage);
+
+  const element = storages.get(id, storage.storageList);
 
   const children = [];
   if (element.children) {
@@ -356,7 +422,9 @@ app.get("/get", (request, response) => {
 app.get("/storage", (request, response) => {
   setHeaders(response);
 
-  const result = storage.getAll().map((element) => {
+  const userName = request.query.userName;
+
+  const result = storages.getAll(userName).map((element) => {
 
     const children = [];
     if (element.children) {
@@ -382,8 +450,14 @@ app.get("/children", (request, response) => {
   setHeaders(response);
 
   const id = parseInt(request.query.id);
+  const userName = request.query.userName;
 
-  const lastElement = storage.get(id);
+  let storage = storages.getStorage(userName);
+  if (!storage)  {
+    storage = storages.createStorage(userName);
+  }
+
+  const lastElement = storages.get(id, storage.storageList);
   let result = [];
 
   if (lastElement.children) {
@@ -415,7 +489,15 @@ app.get("/children", (request, response) => {
 
 app.get("/download", (request, response) => {
   const id = parseInt(request.query.id);
-  const element = storage.get(id);
+  const userName = request.query.userName;
+
+  let storage = storages.getStorage(userName);
+
+  if (!storage)  {
+    storage = storages.createStorage(userName);
+  }
+
+  const element = storages.get(id, storage.storageList);
 
   setHeaders(response);
 
@@ -446,8 +528,9 @@ app.get("/download", (request, response) => {
 
 app.delete("/delete", (request, response) => {
   const id = parseInt(request.query.id);
+  const userName = request.query.userName;
 
-  storage.delete(id);
+  storages.delete(id, userName);
 
   setHeaders(response);
 
@@ -457,10 +540,11 @@ app.delete("/delete", (request, response) => {
 app.post("/createFolder", (request, response) => {
   const name = request.body.name;
   const path = request.body.path;
+  const userName = request.body.userName;
 
   setHeaders(response);
 
-  if (storage.createFolder(name, path)) {
+  if (storages.createFolder(name, path, userName)) {
     response.status(200).end();
   } else {
     response.statusCode = 409;

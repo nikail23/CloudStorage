@@ -10,8 +10,10 @@ import { StorageElement, StorageElementType } from './storage.model';
 export class StorageService {
   constructor(private http: HttpClient) {}
 
-  public get(id: number): Observable<StorageElement> {
-    const params = new HttpParams().set('id', id.toString());
+  public get(id: number, userName: string): Observable<StorageElement> {
+    const params = new HttpParams()
+    .set('id', id.toString())
+    .set('userName', userName);
     return this.http.get('http://127.0.0.1:3000/get', {params}).pipe(
       map((storageElement: any) => {
 
@@ -58,8 +60,10 @@ export class StorageService {
     );
   }
 
-  public getAll(): Observable<StorageElement[]> {
-    return this.http.get('http://127.0.0.1:3000/storage').pipe(
+  public getAll(userName: string): Observable<StorageElement[]> {
+    const params = new HttpParams()
+    .set('userName', userName);
+    return this.http.get('http://127.0.0.1:3000/storage', {params}).pipe(
       map((storageList: any[]) => {
         const newList: StorageElement[] = [];
         storageList.forEach((storageElement) => {
@@ -108,8 +112,10 @@ export class StorageService {
     );
   }
 
-  public getChildren(id: number) {
-    const params = new HttpParams().set('id', id.toString());
+  public getChildren(id: number, userName: string) {
+    const params = new HttpParams()
+    .set('id', id.toString())
+    .set('userName', userName);
     return this.http.get('http://127.0.0.1:3000/children', {params}).pipe(
       map((storageList: any[]) => {
         const newList: StorageElement[] = [];
@@ -159,34 +165,38 @@ export class StorageService {
     );
   }
 
-  public sendFile(file: File, path: number[]): Observable<HttpEvent<Object>> {
+  public sendFile(file: File, path: number[], userName: string): Observable<HttpEvent<Object>> {
     const uploadData = new FormData();
     uploadData.append('UploadFile', file, file.name);
     uploadData.append('Path', JSON.stringify(path));
+    uploadData.append('userName', JSON.stringify(userName));
     return this.http.post('http://127.0.0.1:3000/upload', uploadData, {
       reportProgress: true,
       observe: 'events',
     });
   }
 
-  public downloadFile(id: number, fileName: string): void {
+  public downloadFile(id: number, fileName: string, userName: string): void {
     let downloadAncher = document.createElement("a");
     downloadAncher.style.display = "none";
-    downloadAncher.href = `http://127.0.0.1:3000/download?id=${id}`;
+    downloadAncher.href = `http://127.0.0.1:3000/download?id=${id}&userName=${userName}`;
     downloadAncher.download = fileName;
     downloadAncher.click();
     downloadAncher = null;
   }
 
-  public deleteFile(id: number): Observable<any> {
-    const params = new HttpParams().set('id', id.toString());
+  public deleteFile(id: number, userName: string): Observable<any> {
+    const params = new HttpParams()
+    .set('id', id.toString())
+    .set('userName', userName);
     return this.http.delete('http://127.0.0.1:3000/delete', {params});
   }
 
-  public createFolder(name: string, path: number[]): Observable<any> {
+  public createFolder(name: string, path: number[], userName: string): Observable<any> {
     const body = JSON.stringify({
       name,
-      path
+      path,
+      userName
     });
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
