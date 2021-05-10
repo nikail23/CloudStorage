@@ -10,6 +10,8 @@ export class AppComponent {
 
   title = 'client';
 
+  isStarted = true;
+
   @ViewChild(ListComponent, {static: false})
   private listComponent: ListComponent;
 
